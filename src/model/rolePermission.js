@@ -10,9 +10,9 @@ module.exports = (sequelize, Sequelize) => {
       menu_id: {
         type: Sequelize.INTEGER(22),
       },
-      permission_id:{
-        type:Sequelize.INTEGER(22)
-      }
+      permission_id: {
+        type: Sequelize.INTEGER(22),
+      },
       // add: {
       //   type: Sequelize.ENUM("0", "1"),
       //   allowNull: true,
@@ -61,6 +61,6 @@ module.exports = (sequelize, Sequelize) => {
     let json = this.toJSON();
     return json;
   };
-    // Model.sync({ alter: true });
+  Model.sync({ alter: true });
   return Model;
 };

@@ -17,23 +17,24 @@ const {
 const XLSX = require("xlsx");
 
 module.exports = {
-  signup,
-  getAllUsers,
+  createProduct,
+  getAllProduct,
   changeStatus,
-  getUser,
+  getProduct,
+  updateProduct,
 };
 
-async function getUser(req, res) {
+async function getProduct(req, res) {
   try {
-    await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USER);
+    // await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USER);
     let resData = {};
     let query = req.query;
     var [err, userData] = await to(
-      db.adminUser.findOne({ where: { id: query.id } })
+      db.product.findOne({ where: { id: query.id } })
     );
     if (err) return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
     else resData.success = true;
-    resData.adminUser = userData;
+    resData.Proddb.product = userData;
     return ReS(res, resData, CONFIG.SUCCESS_CODE);
   } catch (error) {
     console.log(error);
@@ -43,10 +44,10 @@ async function getUser(req, res) {
 
 async function changeStatus(req, res) {
   try {
-    await isPrmissionsForThisAPI(req, res, CONFIG.DELETE_USER);
+    // await isPrmissionsForThisAPI(req, res, CONFIG.DELETE_USER);
     let query = req.query;
     var [err, userid] = await to(
-      db.adminUser.findOne({ where: { id: query.id } })
+      db.products.findOne({ where: { id: query.id } })
     );
     if (err) return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
     userid.set({ status: query.status });
@@ -59,9 +60,9 @@ async function changeStatus(req, res) {
   }
 }
 
-async function getAllUsers(req, res) {
+async function getAllProduct(req, res) {
   try {
-    await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USER);
+    // await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USER);
     let whereClause = {};
     let query = req.query;
     let perPage = parseInt(
@@ -78,13 +79,7 @@ async function getAllUsers(req, res) {
       whereClause[Op.and].push({
         [Op.or]: [
           {
-            firstname: { [Op.like]: "%" + keyword.toLowerCase() + "%" },
-          },
-          {
-            lastname: { [Op.like]: "%" + keyword.toLowerCase() + "%" },
-          },
-          {
-            email: { [Op.like]: "%" + keyword.toLowerCase() + "%" },
+            product_name: { [Op.like]: "%" + keyword.toLowerCase() + "%" },
           },
         ],
       });
@@ -93,23 +88,7 @@ async function getAllUsers(req, res) {
     db.adminUser
       .findAndCountAll({
         where: whereClause,
-        attributes: [
-          "id",
-          "firstname",
-          "lastname",
-          "email",
-          "userName",
-          "mobileNumber",
-          "status",
-          "createdAt",
-          "updatedAt",
-        ],
-        include: [
-          {
-            model: db.Role,
-            attributes: ["id", "role_name"],
-          },
-        ],
+
         limit: perPage,
         offset: offset,
         order: [["createdAt", "DESC"]],
@@ -135,19 +114,9 @@ async function getAllUsers(req, res) {
   }
 }
 
-async function signup(req, res) {
+async function createProduct(req, res) {
   try {
-    // await isPrmissionsForThisAPI(req, res, CONFIG.ADD_USER);
-    let isExist = await isEmailExist(req.body.email);
-    if (isExist) {
-      let err = {
-        message: CONFIG.ADMIN_ALREADY_EXIST,
-      };
-      ReE(res, err, CONFIG.SUCCESS_CODE);
-      return;
-    }
-    db.adminUser
-      .create(req.body)
+    db.Product.create(req.body)
       .then(function (data) {
         return ReS(
           res,
@@ -159,6 +128,51 @@ async function signup(req, res) {
         console.log(err);
         return ReE(res, CONFIG.BAD_REQUEST_MESSAGE, CONFIG.BAD_REQUEST);
       });
+  } catch (error) {
+    console.log(error);
+    return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
+  }
+}
+
+async function updateProduct(req, res) {
+  try {
+    // await isPrmissionsForThisAPI(req,res, CONFIG.EDIT_DEAL)
+    var body = req.body;
+    if (body?.id) {
+      await db.deal
+        .update(body, {
+          where: {
+            id: body?.id,
+          },
+        })
+        .then((data) => {
+          return ReS(
+            res,
+            {
+              message: "Product updated",
+            },
+            CONFIG.OK_CODE
+          );
+        })
+        .catch((error) => {
+          console.log(error);
+          return ReE(
+            res,
+            {
+              message: CONFIG.APP_DEAL_UPDATE_ERROR,
+            },
+            CONFIG.BAD_REQUEST
+          );
+        });
+    } else {
+      return ReE(
+        res,
+        {
+          message: CONFIG.PROFILE_DEAL_ID_NOT_FOUND,
+        },
+        CONFIG.BAD_REQUEST
+      );
+    }
   } catch (error) {
     console.log(error);
     return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);

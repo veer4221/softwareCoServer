@@ -61,6 +61,6 @@ module.exports = (sequelize, Sequelize) => {
     Model.belongsTo(models.Menu, { foreignKey: "parent" });
     models.Menu.hasMany(Model, { foreignKey: "parent" });
   };
-    // Model.sync({ alter: true });
+  Model.sync({ alter: true });
   return Model;
 };

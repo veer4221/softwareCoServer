@@ -7,52 +7,6 @@ const jwt = require("jsonwebtoken");
 module.exports = {
   login,
 };
-
-async function login(req, res) {
-  try {
-    let loginRes = {};
-    if (req.body.email && req.body.password) {
-      loginRes = await localLogin(req.body);
-    } else {
-      loginRes.valid = false;
-      loginRes.err = {
-        message: CONFIG.INVALID_REQUEST,
-      };
-    }
-    if (loginRes.valid) {
-      let token =
-        CONFIG.JWT_PRE_TOKEN +
-        jwt.sign(
-          {
-            user_id: loginRes.data.id,
-            email: loginRes.data.email,
-          },
-          CONFIG.JWT_SECRET,
-          {
-            expiresIn: "10h",
-          }
-        );
-      let resData = {
-        profile: loginRes.data,
-        token: token,
-      };
-      let roleID = resData.profile.role_id;
-      ReS(
-        res,
-        {
-          data: resData,
-        },
-        CONFIG.OK_CODE
-      );
-    } else {
-      ReE(res, loginRes.err, CONFIG.OK_CODE);
-    }
-  } catch (error) {
-    console.log(error);
-    return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-  }
-}
-
 async function localLogin(body) {
   try {
     let res = {
@@ -69,24 +23,22 @@ async function localLogin(body) {
       include: [
         {
           model: db.Role,
-          attributes: ["id","role_name"],
+          attributes: ["id", "role_name"],
           include: [
             {
               model: db.RolePermission,
-              attributes: ["id","menu_id","permission_id"],
+              attributes: ["id", "menu_id", "permission_id"],
 
               include: [
                 {
                   model: db.Menu,
-                  attributes: ["menu_name","menu_value"],
+                  attributes: ["menu_name", "menu_value"],
                   include: [
                     {
                       model: db.Menu,
-                      attributes: ["menu_name","menu_value"],
-
+                      attributes: ["menu_name", "menu_value"],
                     },
                   ],
-
                 },
               ],
             },
@@ -134,6 +86,51 @@ async function localLogin(body) {
         };
         return res;
       }
+    }
+  } catch (error) {
+    console.log(error);
+    return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
+  }
+}
+
+async function login(req, res) {
+  try {
+    let loginRes = {};
+    if (req.body.email && req.body.password) {
+      loginRes = await localLogin(req.body);
+    } else {
+      loginRes.valid = false;
+      loginRes.err = {
+        message: CONFIG.INVALID_REQUEST,
+      };
+    }
+    if (loginRes.valid) {
+      let token =
+        CONFIG.JWT_PRE_TOKEN +
+        jwt.sign(
+          {
+            user_id: loginRes.data.id,
+            email: loginRes.data.email,
+          },
+          CONFIG.JWT_SECRET,
+          {
+            expiresIn: "10h",
+          }
+        );
+      let resData = {
+        profile: loginRes.data,
+        token: token,
+      };
+      let roleID = resData.profile.role_id;
+      ReS(
+        res,
+        {
+          data: resData,
+        },
+        CONFIG.OK_CODE
+      );
+    } else {
+      ReE(res, loginRes.err, CONFIG.OK_CODE);
     }
   } catch (error) {
     console.log(error);

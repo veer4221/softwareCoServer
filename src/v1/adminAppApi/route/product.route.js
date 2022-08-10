@@ -1,29 +1,30 @@
 const express = require("express");
 const router = express.Router();
-const userService = require("../service/user.service");
+const productService = require("../service/product.service");
 const passport = require("passport");
 
 router.post(
-  "/signup",
+  "/createProduct",
   // passport.authenticate('jwt', {
   //     session: false
   // }),
-  userService.signup
+  productService.productService
 );
 
 router.get(
-  "/getUser",
+  "/getAllProduct",
   passport.authenticate("jwt", {
     session: false,
   }),
-  userService.getUser
+  productService.getAllProduct
 );
+
 router.get(
-  "/getAllUsers",
+  "/getProduct",
   passport.authenticate("jwt", {
     session: false,
   }),
-  userService.getAllUsers
+  productService.getProduct
 );
 
 router.get(
@@ -31,7 +32,14 @@ router.get(
   passport.authenticate("jwt", {
     session: false,
   }),
-  userService.changeStatus
+  productService.changeStatus
+);
+router.post(
+  "/EditProduct",
+  passport.authenticate("jwt", {
+    session: false,
+  }),
+  productService.updateProduct
 );
 
 module.exports.router = router;
