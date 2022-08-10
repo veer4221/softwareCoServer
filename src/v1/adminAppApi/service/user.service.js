@@ -135,6 +135,25 @@ async function getAllUsers(req, res) {
   }
 }
 
+async function isEmailExist(email, Id = null) {
+  whereClause = {
+    [Op.and]: [{ status: { [Op.ne]: CONFIG.RECORD_DELETED } }],
+  };
+
+  if (Id != null) {
+    whereClause[Op.and].push({
+      [Op.and]: [{ id: { [Op.ne]: Id } }, { email: email }],
+    });
+  } else {
+    whereClause[Op.and].push({
+      [Op.and]: [{ email: email }],
+    });
+  }
+  let users = await db.adminUser.findAndCountAll({
+    where: whereClause,
+  });
+  return users.count > 0 ? true : false;
+}
 async function signup(req, res) {
   try {
     // await isPrmissionsForThisAPI(req, res, CONFIG.ADD_USER);
