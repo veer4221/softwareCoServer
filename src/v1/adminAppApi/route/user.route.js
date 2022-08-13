@@ -10,6 +10,13 @@ router.post(
   // }),
   userService.signup
 );
+router.post(
+  "/updateUser",
+  // passport.authenticate('jwt', {
+  //     session: false
+  // }),
+  userService.updateUser
+);
 
 router.get(
   "/getUser",

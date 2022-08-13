@@ -11,9 +11,7 @@ const { user } = require("../../../config/db");
 const { where } = require("sequelize");
 // const EmailSender = require("../../../../helper/emailSender");
 
-const {
-  isPrmissionsForThisAPI,
-} = require("../../../middleware/PermissionCheck");
+const { isPrmissionsForThisAPI } = require("../../../middleware/PermissionCheck");
 const XLSX = require("xlsx");
 
 module.exports = {
@@ -29,12 +27,10 @@ async function getProduct(req, res) {
     // await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USER);
     let resData = {};
     let query = req.query;
-    var [err, userData] = await to(
-      db.product.findOne({ where: { id: query.id } })
-    );
+    var [err, userData] = await to(db.Product.findOne({ where: { id: query.id } }));
     if (err) return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
     else resData.success = true;
-    resData.Proddb.product = userData;
+    resData.Productdata = userData;
     return ReS(res, resData, CONFIG.SUCCESS_CODE);
   } catch (error) {
     console.log(error);
@@ -46,9 +42,7 @@ async function changeStatus(req, res) {
   try {
     // await isPrmissionsForThisAPI(req, res, CONFIG.DELETE_USER);
     let query = req.query;
-    var [err, userid] = await to(
-      db.products.findOne({ where: { id: query.id } })
-    );
+    var [err, userid] = await to(db.products.findOne({ where: { id: query.id } }));
     if (err) return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
     userid.set({ status: query.status });
     [err, userid] = await to(userid.save());
@@ -65,9 +59,7 @@ async function getAllProduct(req, res) {
     // await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USER);
     let whereClause = {};
     let query = req.query;
-    let perPage = parseInt(
-      query.limit == undefined ? CONFIG.PERPAGE : query.limit
-    ); // number of records per page
+    let perPage = parseInt(query.limit == undefined ? CONFIG.PERPAGE : query.limit); // number of records per page
     let page = parseInt(query.page == undefined ? 1 : query.page); //page
     let offset = perPage * (page - 1);
     let keyword = query.keyword;
@@ -85,23 +77,18 @@ async function getAllProduct(req, res) {
       });
     }
 
-    db.adminUser
-      .findAndCountAll({
-        where: whereClause,
+    db.Product.findAndCountAll({
+      where: whereClause,
 
-        limit: perPage,
-        offset: offset,
-        order: [["createdAt", "DESC"]],
-      })
+      limit: perPage,
+      offset: offset,
+      order: [["createdAt", "DESC"]],
+    })
       .then(async function (users) {
         if (users) {
           return ReS(res, users, CONFIG.SUCCESS_CODE);
         } else {
-          return ReS(
-            res,
-            { users, message: CONFIG.NO_DATA_FOUND },
-            CONFIG.SUCCESS_CODE
-          );
+          return ReS(res, { users, message: CONFIG.NO_DATA_FOUND }, CONFIG.SUCCESS_CODE);
         }
       })
       .catch((error) => {
@@ -118,11 +105,7 @@ async function createProduct(req, res) {
   try {
     db.Product.create(req.body)
       .then(function (data) {
-        return ReS(
-          res,
-          { data, message: CONFIG.SUCCESS_RESULT },
-          CONFIG.SUCCESS_CODE
-        );
+        return ReS(res, { data, message: CONFIG.SUCCESS_RESULT }, CONFIG.SUCCESS_CODE);
       })
       .catch(function (err) {
         console.log(err);

@@ -2,7 +2,8 @@ var express = require("express");
 var cors = require("cors");
 var app = express();
 var path = require("path");
-var bodyParser = require("body-parser");
+// var bodyParser = require("body-parser");
+const bodyparser = require("body-parser");
 const dotenv = require("dotenv");
 const models = require("./src/model");
 const fileUpload = require("express-fileupload");
@@ -26,6 +27,12 @@ app.use(express.json({ limit: "50mb" }));
 app.use(
   express.urlencoded({
     extended: false,
+  })
+);
+app.use(bodyparser.json());
+app.use(
+  bodyparser.urlencoded({
+    extended: true,
   })
 );
 app.use(fileUpload()); // Don't forget this line!
@@ -64,10 +71,7 @@ app.use(function (req, res, next) {
   // Website you wish to allow to connect
   res.setHeader("Access-Control-Allow-Origin", "*");
   // Request methods you wish to allow
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, OPTIONS, PUT, PATCH, DELETE, HEAD"
-  );
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE, HEAD");
   // Request headers you wish to allow
   res.setHeader(
     "Access-Control-Allow-Headers",

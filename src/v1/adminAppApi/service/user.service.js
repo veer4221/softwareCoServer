@@ -21,11 +21,57 @@ module.exports = {
   getAllUsers,
   changeStatus,
   getUser,
+  updateUser
 };
 
+
+async function updateUser(req, res) {
+  try {
+    // await isPrmissionsForThisAPI(req,res, CONFIG.EDIT_DEAL)
+    var body = req.body;
+    if (body?.id) {
+      await db.adminUser
+        .update(body, {
+          where: {
+            id: body?.id,
+          },
+        })
+        .then((data) => {
+          return ReS(
+            res,
+            {
+              message: "user updated",
+            },
+            CONFIG.OK_CODE
+          );
+        })
+        .catch((error) => {
+          console.log(error);
+          return ReE(
+            res,
+            {
+              message: CONFIG.APP_DEAL_UPDATE_ERROR,
+            },
+            CONFIG.BAD_REQUEST
+          );
+        });
+    } else {
+      return ReE(
+        res,
+        {
+          message: CONFIG.PROFILE_DEAL_ID_NOT_FOUND,
+        },
+        CONFIG.BAD_REQUEST
+      );
+    }
+  } catch (error) {
+    console.log(error);
+    return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
+  }
+}
 async function getUser(req, res) {
   try {
-    await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USER);
+    // await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USER);
     let resData = {};
     let query = req.query;
     var [err, userData] = await to(
@@ -61,7 +107,7 @@ async function changeStatus(req, res) {
 
 async function getAllUsers(req, res) {
   try {
-    await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USER);
+    // await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USER);
     let whereClause = {};
     let query = req.query;
     let perPage = parseInt(
@@ -170,7 +216,7 @@ async function signup(req, res) {
       .then(function (data) {
         return ReS(
           res,
-          { data, message: CONFIG.SUCCESS_RESULT },
+          { data, message: CONFIG.USER_CREATED_MESSAGE },
           CONFIG.SUCCESS_CODE
         );
       })

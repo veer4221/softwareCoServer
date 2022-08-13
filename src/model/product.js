@@ -18,11 +18,11 @@ module.exports = function (sequelize, Sequelize) {
         allowNull: true,
       },
       product_image: {
-        type: Sequelize.STRING,
+        type: Sequelize.TEXT,
         allowNull: true,
       },
       product_information: {
-        type: Sequelize.STRING(10),
+        type: Sequelize.STRING,
         allowNull: true,
       },
       status: {

@@ -8,7 +8,7 @@ router.post(
   // passport.authenticate('jwt', {
   //     session: false
   // }),
-  productService.productService
+  productService.createProduct
 );
 
 router.get(
