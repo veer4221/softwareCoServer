@@ -5,9 +5,9 @@ const passport = require("passport");
 
 router.post(
   "/createProduct",
-  // passport.authenticate('jwt', {
-  //     session: false
-  // }),
+  passport.authenticate('jwt', {
+    session: false
+  }),
   productService.createProduct
 );
 
@@ -17,6 +17,14 @@ router.get(
     session: false,
   }),
   productService.getAllProduct
+);
+
+router.get(
+  "/getCart",
+  passport.authenticate("jwt", {
+    session: false,
+  }),
+  productService.getCart
 );
 
 router.get(
@@ -34,6 +42,14 @@ router.get(
   }),
   productService.changeStatus
 );
+router.get(
+  "/removeFromCart",
+  passport.authenticate("jwt", {
+    session: false,
+  }),
+  productService.changeCartStatus
+);
+
 router.post(
   "/EditProduct",
   passport.authenticate("jwt", {
@@ -41,5 +57,11 @@ router.post(
   }),
   productService.updateProduct
 );
-
+router.post(
+  "/addtocart",
+  passport.authenticate("jwt", {
+    session: false,
+  }),
+  productService.addToCart
+);
 module.exports.router = router;

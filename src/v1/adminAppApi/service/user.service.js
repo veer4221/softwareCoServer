@@ -1,16 +1,8 @@
 const moment = require("moment");
 const { v4: uuidv4 } = require("uuid");
-var bcrypt = require("bcrypt-nodejs");
+
 const Op = require("sequelize").Op;
 const db = require("../../../model");
-const readXlsxFile = require("read-excel-file/node");
-var path = require("path");
-var Sequelize = require("sequelize");
-const roleAndPermissionChecker = require("../../../middleware/roleAndPermissionChecker");
-const { user } = require("../../../config/db");
-const { where } = require("sequelize");
-// const EmailSender = require("../../../../helper/emailSender");
-
 const {
   isPrmissionsForThisAPI,
 } = require("../../../middleware/PermissionCheck");
@@ -28,6 +20,8 @@ module.exports = {
 async function updateUser(req, res) {
   try {
     // await isPrmissionsForThisAPI(req,res, CONFIG.EDIT_DEAL)
+    await isPrmissionsForThisAPI(req, res, CONFIG.ROLE_ASSIGN)
+
     var body = req.body;
     if (body?.id) {
       await db.adminUser
@@ -70,6 +64,8 @@ async function updateUser(req, res) {
   }
 }
 async function getUser(req, res) {
+  await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USERS)
+
   try {
     // await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USER);
     let resData = {};
@@ -107,6 +103,8 @@ async function changeStatus(req, res) {
 
 async function getAllUsers(req, res) {
   try {
+    await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USERS)
+
     // await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_USER);
     let whereClause = {};
     let query = req.query;

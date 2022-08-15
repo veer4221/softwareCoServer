@@ -12,9 +12,9 @@ router.post(
 );
 router.post(
   "/updateUser",
-  // passport.authenticate('jwt', {
-  //     session: false
-  // }),
+  passport.authenticate('jwt', {
+    session: false
+  }),
   userService.updateUser
 );
 

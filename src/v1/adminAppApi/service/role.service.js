@@ -9,41 +9,14 @@ module.exports = {
   getAllRole,
   updateRole,
   getRole,
-  changeRoleStatus,
+
   getRoleAndID,
 };
 
-async function changeRoleStatus(req, res) {
-  try {
-    try {
-      await isPrmissionsForThisAPI(req, res, CONFIG.DELETE_ROLE);
-
-      userId = req.user.dataValues.id;
-      const result = await roleAndPermissionChecker(userId, CONFIG.DELETE_ROLE);
-      if (result == 0) {
-        return ReE(res, CONFIG.PERMISSION_ERROR, CONFIG.FORBIDDEN);
-      } else if (result == 3) {
-        return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-      }
-    } catch (error) {
-      console.log(error);
-      return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-    }
-    let query = req.query;
-    var [err, RoleObj] = await to(db.Role.findOne({ where: { id: query.id } }));
-    if (err) return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-    RoleObj.set({ status: query.status });
-    [err, RoleObj] = await to(RoleObj.save());
-    if (err) return ReE(res, CONFIG.ERROR_CODE);
-    else return ReS(res, CONFIG.SUCCESS_ROLE_DELETED, CONFIG.SUCCESS_CODE);
-  } catch (error) {
-    console.log(error);
-    return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-  }
-}
 async function getRoleMenu(req, res) {
   try {
     // await isPrmissionsForThisAPI(req,res, CONFIG.)
+    await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_PERMISSIONS)
 
     let nodes = [];
     let whereClause = {};
@@ -109,10 +82,6 @@ async function createManuObj(nodes, indexMenu) {
         parentObj.label = item.menu_name;
         parentObj.children = children;
         nodes.push(parentObj);
-        // console.log(nodes);
-        // if (indexMenu.rows.length == index) {
-        //   return resolve({ nodes });
-        // }
       } catch (error) {
         console.log(error);
         return reject({ error });
@@ -128,18 +97,7 @@ async function createRole(req, res) {
   try {
     // await isPrmissionsForThisAPI(req, res, CONFIG.ADD_ROLE);
 
-    // try {
-    //   userId = req.user.dataValues.id;
-    //   const result = await roleAndPermissionChecker(userId, CONFIG.ADD_ROLE);
-    //   if (result == 0) {
-    //     return ReE(res, CONFIG.PERMISSION_ERROR, CONFIG.FORBIDDEN);
-    //   } else if (result == 3) {
-    //     return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    //   return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-    // }
+
     let isExist = await isRoleExist(req.body.role_name);
     if (isExist) {
       let err = {
@@ -150,35 +108,7 @@ async function createRole(req, res) {
     }
     db.Role.create(req.body)
       .then(function (data) {
-        const role_Id = data.id;
-        // (async function loop() {
-        //   for (let i = 0; i < req.body.permission.length; i++) {
-        //     let permissionId = parseInt(req.body.permission[i]);
 
-        //     var [err, parentId] = await to(
-        //       db.Menu.findAll({
-        //         where: {
-        //           id: permissionId,
-        //         },
-        //         attributes: ["parent"],
-        //       })
-        //     );
-
-        //     if (err)
-        //       return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-
-        //     var permissionBody = {};
-        //     permissionBody.role_id = role_Id;
-        //     permissionBody.menu_id = parentId[0].parent;
-        //     permissionBody.permission_id = req.body.permission[i];
-        //     const [error, permissionObject] = await to(
-        //       db.RolePermission.create(permissionBody)
-        //     );
-        //     if (error) {
-        //       return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-        //     }
-        //   }
-        // })();
         return ReS(res, { data, message: CONFIG.SUCCESS_RESULT }, CONFIG.SUCCESS_CODE);
       })
       .catch(function (err) {
@@ -202,21 +132,10 @@ async function isRoleExist(role_name) {
 }
 
 async function getAllRole(req, res) {
-  try {
-    // await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_ROLE);
+  await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_PERMISSIONS)
 
-    // try {
-    //   userId = req.user.dataValues.id;
-    //   // const result = await roleAndPermissionChecker(userId, CONFIG.VIEW_ROLE);
-    //   if (result == 0) {
-    //     return ReE(res, CONFIG.PERMISSION_ERROR, CONFIG.FORBIDDEN);
-    //   } else if (result == 3) {
-    //     return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    //   return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-    // }
+  try {
+
     let whereClause = {};
     let query = req.query;
     let perPage = parseInt(query.limit == undefined ? CONFIG.PERPAGE : query.limit); // number of records per page
@@ -287,21 +206,13 @@ async function getRoleAndID(req, res) {
   }
 }
 async function updateRole(req, res) {
+  await isPrmissionsForThisAPI(req, res, CONFIG.EDIT_ROLE_AND_PERMISSIONS)
+
   // await isPrmissionsForThisAPI(req, res, CONFIG.MODIFY_ROLE);
 
   try {
-    // try {
-    //   userId = req.user.dataValues.id;
-    //   const result = await roleAndPermissionChecker(userId, CONFIG.MODIFY_ROLE);
-    //   if (result == 0) {
-    //     return ReE(res, CONFIG.PERMISSION_ERROR, CONFIG.FORBIDDEN);
-    //   } else if (result == 3) {
-    //     return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    //   return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-    // }
+
+
     var body = req.body;
     if (body.id) {
       let RoleId = body.id;
@@ -327,7 +238,6 @@ async function updateRole(req, res) {
           (async function loop() {
             for (let i = 0; i < req.body.permission.length; i++) {
               let permissionId = parseInt(req.body.permission[i]);
-
               var [err, parentId] = await to(
                 db.Menu.findAll({
                   where: {
@@ -385,21 +295,11 @@ async function updateRole(req, res) {
 }
 
 async function getRole(req, res) {
+  await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_PERMISSIONS)
+
   try {
     // await isPrmissionsForThisAPI(req, res, CONFIG.VIEW_ROLE);
 
-    // try {
-    //   userId = req.user.dataValues.id;
-    //   const result = await roleAndPermissionChecker(userId, CONFIG.VIEW_ROLE);
-    //   if (result == 0) {
-    //     return ReE(res, CONFIG.PERMISSION_ERROR, CONFIG.FORBIDDEN);
-    //   } else if (result == 3) {
-    //     return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-    //   }
-    // } catch (error) {
-    //   console.log(error);
-    //   return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
-    // }
     let resData = {};
     let query = req.query;
     var [err, roleData] = await to(db.Role.findOne({ where: { id: query.id } }));
@@ -427,8 +327,6 @@ async function getRole(req, res) {
     if (error) return ReE(res, CONFIG.INTERNAL_SERVER_ERROR, CONFIG.ERROR_CODE);
     else resData.success = true;
     resData.permissions = permissionArray;
-
-    // res.send(permissionArray)
     return ReS(res, resData, CONFIG.SUCCESS_CODE);
   } catch (error) {
     console.log(error);

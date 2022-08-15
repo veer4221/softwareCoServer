@@ -13,32 +13,7 @@ module.exports = (sequelize, Sequelize) => {
       permission_id: {
         type: Sequelize.INTEGER(22),
       },
-      // add: {
-      //   type: Sequelize.ENUM("0", "1"),
-      //   allowNull: true,
-      // },
-      // edit: {
-      //   type: Sequelize.ENUM("0", "1"),
-      //   allowNull: true,
-      // },
-      // delete: {
-      //   type: Sequelize.ENUM("0", "1"),
-      //   allowNull: true,
-      // },
-      // view: {
-      //   type: Sequelize.ENUM("0", "1"),
-      //   allowNull: true,
-      // },
-      /* created_at: {
-            allowNull: true,
-            type: Sequelize.DATE,
-            default:Date.now
-        },
-        updated_at: {
-            allowNull: true,
-            type: Sequelize.DATE,
-            default:Date.now
-        }   */
+
     },
     {
       createdAt: "created_at",

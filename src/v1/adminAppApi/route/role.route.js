@@ -10,13 +10,6 @@ router.get(
   }),
   roleManuService.getRoleAndID
 );
-router.get(
-  "/RemoveRole",
-  passport.authenticate("jwt", {
-    session: false,
-  }),
-  roleManuService.changeRoleStatus
-);
 
 router.post(
   "/addRole",
